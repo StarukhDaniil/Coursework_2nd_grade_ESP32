@@ -1,5 +1,6 @@
-// #include <Wire.h>
+#include <Arduino.h>
 #include <LiquidCrystal_I2C.h>
+#include "signal_processing.h"
 
 LiquidCrystal_I2C lcd(0x27, 20, 4);
 HardwareSerial uart(2);
@@ -11,7 +12,7 @@ HardwareSerial uart(2);
 uint16_t ADC_value = 0;
 uint16_t counter = 0;
 
-uint16_t a = 0;
+uint8_t a = 0;
 
 void setup() {
   uart.begin(UART2_BAUD, SERIAL_8N1, UART2_RX, UART2_TX);
