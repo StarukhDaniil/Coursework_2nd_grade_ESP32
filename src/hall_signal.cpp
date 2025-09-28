@@ -1,4 +1,4 @@
-#include "signal_processing.h"
+#include "hall_signal.h"
 
 HallSignal::HallSignal() 
   : rslts_pos_m(0) {

@@ -1,5 +1,5 @@
 #include "main_helper.h"
-#include "signal_processing.h"
+#include "hall_signal.h"
 #include <Arduino.h>
 
 extern HallSignal hall_signal;

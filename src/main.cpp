@@ -2,7 +2,7 @@
 #include <LiquidCrystal_I2C.h>
 #include <esp32-hal-timer.h>
 #include <HardwareSerial.h>
-#include "signal_processing.h"
+#include "hall_signal.h"
 #include "main_helper.h"
 
 HallSignal hall_signal;
