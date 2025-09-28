@@ -5,5 +5,5 @@
 extern HallSignal hall_signal;
 
 void IRAM_ATTR Timer0_ISR() {
-
+    hall_signal.update_trshld();
 }
