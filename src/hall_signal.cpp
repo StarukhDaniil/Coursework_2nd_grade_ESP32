@@ -54,6 +54,7 @@ void HallSignal::add_rslt() {
   }
 
   filter_cnt_m = 0;
+  rslts_m[rslts_pos_m] = filter_m;
 
   if (rslts_pos_m == RSLTS_SIZE - 1) {
     rslts_pos_m = 0;
@@ -61,13 +62,17 @@ void HallSignal::add_rslt() {
   else {
     ++rslts_pos_m;
   }
-
-  rslts_m[rslts_pos_m] = filter_m;
 }
 
 void HallSignal::update_trshld() {
-  if (!(info_m & SIGNAL_VALUE)) {
+  if (!(info_m & SIGNAL_VALUE) && info_m & FILTER_FILLED) {
     threshold_top_m = filter_m + THRESHOLD_OFFSET;
-    threshold_bottom_m = filter_m - THRESHOLD_OFFSET;
+
+    if (filter_m < THRESHOLD_OFFSET) {
+      threshold_bottom_m = 0;
+    }
+    else {
+      threshold_bottom_m = filter_m - THRESHOLD_OFFSET;
+    }
   }
 }

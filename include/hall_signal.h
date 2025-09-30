@@ -8,7 +8,7 @@
 #define RSLTS_SIZE 1024
 #define FILTER_COEF 0.125
 #define FILTER_SIZE 8
-#define THRESHOLD_OFFSET 4
+#define THRESHOLD_OFFSET 50
 
 class HallSignal {
   uint16_t rslts_m[RSLTS_SIZE];
