@@ -5,45 +5,28 @@
 #include <Ticker.h>
 #include "hall_signal.h"
 #include "main_helper.h"
+#include "bluetoothmanager.h"
+#include "blebuff_service.h"
 
 HallSignal hall_signal;
 ESP32SPISlave spi2Slave;
-hw_timer_t* Timer0_Cfg = nullptr;
+BLEBuff_Service BBuffService(hall_signal);
 
-Ticker logging_ticker;
+Ticker thresholdUpd_ticker;
 
 uint8_t SPI2_RxBuff[RX_DATA_BUFF_SIZE] = {0};
 
-int transactions_count = 0;
-bool logging_allowed = false;
+BLECharacteristic *pCharacteristic;
+bool deviceConnected = false;
 
-void on_logging_ticker() {
-    logging_allowed = true;
-}
-
-void note_transaction_count() {
-    Serial.printf("%i      \n", transactions_count);
-
-    uint16_t* pRxBuff = reinterpret_cast<uint16_t*>(SPI2_RxBuff);
-
-    for (size_t i = 0; i < 32; ++i) {
-        Serial.printf("%i  ", *(pRxBuff + i));
-    }
-
-    Serial.printf("\n---------   %i\n", hall_signal.filter_value());
-
-    transactions_count = 0;
-
-    logging_allowed = false;
-}
+MyServerCallbacks g_serverCallbacks;
+MyCharacteristicCallbacks g_charCallbacks;
 
 void setup() {
     pinMode(23, OUTPUT);
-    setup_timer0();
     setup_spi2();
-
-    logging_ticker.attach(1.0, on_logging_ticker);
-
+    thresholdUpd_ticker.attach(1.0, updateThreshold_wrapper);
+    setupBLE();
     Serial.begin(115200);
 }
 
@@ -53,18 +36,20 @@ void loop() {
     }
 
     if (spi2Slave.available()) {
-        ++transactions_count;
         // pointer for reading buffer as uint16_t
         uint16_t* pRxBuff = reinterpret_cast<uint16_t*>(SPI2_RxBuff);
 
-        for (size_t i = 0; i < RSLTS_PER_PCKT; ++i) {
-            hall_signal.add_value(*(pRxBuff + i));
+        hall_signal.add_values(pRxBuff, RSLTS_PER_PCKT);
+
+        if (hall_signal.info() & SIGNAL_VALUE) {
+            digitalWrite(23, HIGH);
+        }
+        else {
+            digitalWrite(23, LOW);
         }
 
+        BBuffService.handleNewData();
+
         spi2Slave.pop();
-        
-        if (logging_allowed) {
-            note_transaction_count();
-        }
     }
 }

@@ -12,8 +12,6 @@
 // how many results are in one SPI transaction
 #define RSLTS_PER_PCKT RX_DATA_BUFF_SIZE / 2
 
-void IRAM_ATTR Timer0_ISR();
 void setup_spi2();
-void setup_lcd();
-void setup_timer0();
-bool ask_for_data();
+void updateThreshold_wrapper();
+void sendData(uint8_t* data, size_t size);

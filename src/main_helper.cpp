@@ -5,26 +5,37 @@
 
 #include "main_instances.h"
 
-static uint8_t cmd;
-
-void IRAM_ATTR Timer0_ISR() {
-    // hall_signal.update_trshld();
-}
+#define BYTES_PER_BLE_PCKT 200
 
 void setup_spi2() {
     spi2Slave.begin(VSPI, SPI2_CLK, SPI2_MISO, SPI2_MOSI, SPI2_SS);
     spi2Slave.setDataMode(SPI_MODE0);
 }
 
-void setup_lcd() {
-    lcd.init();
-    lcd.backlight();
-    lcd.setCursor(0, 0);
+void sendData(uint8_t* data, size_t size) {
+    Serial.println("sending data");
+
+    if (!deviceConnected) {
+        return;
+    }
+
+    if (size > BYTES_PER_BLE_PCKT) {
+        for (size_t i = 0; i < size; i += BYTES_PER_BLE_PCKT) {
+            if (size - i <= BYTES_PER_BLE_PCKT) {
+                pCharacteristic->setValue(data + i, size - i);
+                pCharacteristic->indicate();
+                return;
+            }
+            pCharacteristic->setValue(data + i, BYTES_PER_BLE_PCKT);
+            pCharacteristic->indicate();
+        }
+    }
+    else {
+        pCharacteristic->setValue(data, size);
+        pCharacteristic->indicate();
+    }
 }
 
-void setup_timer0() {
-    Timer0_Cfg = timerBegin(0, 80, true);
-    timerAttachInterrupt(Timer0_Cfg, &Timer0_ISR, true);
-    timerAlarmWrite(Timer0_Cfg, 1000000, true);
-    timerAlarmEnable(Timer0_Cfg);
+void updateThreshold_wrapper() {
+    hall_signal.update_trshld();
 }
