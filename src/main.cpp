@@ -39,7 +39,10 @@ void loop() {
         // pointer for reading buffer as uint16_t
         uint16_t* pRxBuff = reinterpret_cast<uint16_t*>(SPI2_RxBuff);
 
-        hall_signal.add_values(pRxBuff, RSLTS_PER_PCKT);
+        for (size_t i = 0; i < RSLTS_PER_PCKT; ++i) {
+            hall_signal.add_value(*(pRxBuff + i));
+            BBuffService.handleNewData();
+        }
 
         if (hall_signal.info() & SIGNAL_VALUE) {
             digitalWrite(23, HIGH);
@@ -47,8 +50,6 @@ void loop() {
         else {
             digitalWrite(23, LOW);
         }
-
-        BBuffService.handleNewData();
 
         spi2Slave.pop();
     }

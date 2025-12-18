@@ -11,6 +11,7 @@ BLEBuff_Service::BLEBuff_Service(const HallSignal& hallSignal)
     , p16_rslts(hallSignal.p16_rslts())
     , endSignalHighCounter(0)
     , signalHandled(true)
+    , BLESkipPointsCounter(0)
 {
 
 }
@@ -71,6 +72,13 @@ void BLEBuff_Service::checkSend() {
 }
 
 void BLEBuff_Service::handleNewData() {
+    if (BLESkipPointsCounter != BLE_SKIP_POINTS) {
+        ++BLESkipPointsCounter;
+        return;
+    }
+
+    BLESkipPointsCounter = 0;
+    
     if (hall_signal.info() & SIGNAL_VALUE) {
         signalHandled = false;
         endSignalHighCounter = 0;

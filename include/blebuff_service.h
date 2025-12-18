@@ -4,9 +4,11 @@
 #define BLEBUFF_SIZE8 4096
 #define BLEBUFF_SIZE16 BLEBUFF_SIZE8 / 2
 // defines how much POINTS before and after signal recognition will be added to graph
-#define SIGNAL_POINTS_OFFSET 20
+#define SIGNAL_POINTS_OFFSET 35
 // defines how much BYTES before and after signal recognition will be added to graph
 #define SIGNAL_POINTS_OFFSET_BYTES  SIGNAL_POINTS_OFFSET * 2
+
+#define BLE_SKIP_POINTS 0
 
 class BLEBuff_Service {
 private:
@@ -19,6 +21,8 @@ private:
     // index for 16-bit representation
     size_t BLEBuff_idx16;
     size_t endSignalHighCounter;
+
+    size_t BLESkipPointsCounter;
 
     const uint8_t* p8_rslts;
     const uint16_t* p16_rslts;
